@@ -1,0 +1,162 @@
+﻿// MINI PLAYER
+$('.playButton').click(function() {
+  var id = this.parentNode.id;
+  var cat = this.parentNode.dataset.category;
+  
+  if (window.audio === undefined) {
+    window.audio = new Audio('/wp-content/themes/okwell/assets/audio/'+cat+'/'+id+'.mp3');
+    window.trackId = id;
+    audio.play();
+    $(this).addClass('hidden');
+    $(this).siblings('.pauseButton').removeClass('hidden');
+  } 
+  else if (id === trackId) {
+    audio.play();
+    $(this).addClass('hidden');
+    $(this).siblings('.pauseButton').removeClass('hidden');
+  }
+  else {
+    audio.pause();
+    delete audio;
+    delete trackId;
+    window.audio = new Audio('/wp-content/themes/okwell/assets/audio/'+cat+'/'+id+'.mp3');
+    window.trackId = id;
+    audio.play();
+
+    $('.audio').each(function() {
+      $(this).children('.playButton').removeClass('hidden');
+      $(this).children('.pauseButton').addClass('hidden');
+    })
+    $(this).addClass('hidden');
+    $(this).siblings('.pauseButton').removeClass('hidden');
+  }
+
+  $(audio).on('ended', function() {
+    $('.audio').each(function() {
+      $(this).children('.playButton').removeClass('hidden');
+      $(this).children('.pauseButton').addClass('hidden');
+    })
+  })
+
+})
+
+$('.pauseButton').click(function() {
+
+  audio.pause();
+  $(this).addClass('hidden');
+  $(this).siblings('.playButton').removeClass('hidden');
+})
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+});
+
+// Listen words
+function playAudio() {
+  var word = $.trim($('#wordToListen').val());
+  var wordLowerCase = word.toLowerCase();
+  var audioFile = '/wp-content/themes/okwell/assets/audio/words/'+wordLowerCase+'.mp3';
+
+  var request = $.ajax({
+    url: audioFile,
+    method: 'HEAD',
+    async: false
+  });
+
+  request.done(function() {
+    window.audio = new Audio(audioFile);
+    audio.play();
+  });
+
+  request.fail(function() {
+    alert('К сожалению, такое слово отсутсвует в базе данных. Рекомендуем проверить правописания.');
+  });
+
+}
+
+$('#listen').click(playAudio);
+
+
+// Translate words
+function translateWord(word) {
+
+  $('#wordToListen').val(word);
+
+  $.ajax({
+    url: '/wp-content/themes/okwell2/assets/translatewords/translate.php?word='+word,
+
+    success: function(data) {
+      $('#translation').html(data);
+    },
+    error: function(){
+      $('#translation').text('К сожалению, произошла ошибка.');
+    }
+  })
+}
+
+$('#translate').click(function() {
+
+  var word = $('#wordToListen').val();
+  translateWord(word);
+
+});
+
+$('#wordToListen').keypress(function (e) {
+  if (e.which == 13) {
+    var word = $('#wordToListen').val();
+    translateWord(word);
+  }
+});
+
+
+// Random Quiz
+function randomQuizCheck(form) {
+$('#random-test-alert').remove();
+$('.random_quiz_choice:checked').each(function (i, elem) {
+  if ( $(this).val() == 1 ) {   
+    $('#random-quiz-result').html('<div id="random-test-alert" class="alert alert-success">Great! You are a genius.</div>');
+  } else {      
+    $('#random-quiz-result').html('<div id="random-test-alert" class="alert alert-danger">Oops! Wrong answer. Try again.</div>');
+  }
+});
+}
+
+
+// TRANSLATE TEXT
+$('#translate-text').click(function () {
+
+  if ($(this).attr('disabled') == 'disabled')
+    return;
+
+  var uri = window.location.href;
+  var regexp = /\/[\w-]+\.html/ig;
+  var result = uri.match(regexp);
+  var cacheFileName = result[0].substr(1);
+
+  $(this).attr('disabled', 'disabled');
+  $(this).text('Подождите...');
+  var text = $('#single-content').html();
+  pos = text.toLowerCase().indexOf('словар');
+  if (pos === -1) {
+    onlyTextBefore = text;
+  } else {
+    onlyTextBefore = text.substring(0, pos);
+  }
+
+  var onlyText = encodeURIComponent(onlyTextBefore.replace(/&nbsp;/g, ''));
+  console.log(onlyText);
+
+  $.ajax({
+
+    url: '/wp-content/themes/okwell/assets/cache/cache.php?file='+cacheFileName+'&text='+onlyText,
+
+    success: function(data) {
+        $('#translated-text').html(data+'Переведено сервисом <a target="_blank" href="https://translate.yandex.ru/">«Яндекс.Переводчик»</a>');
+        $('#translate-text').text('Текст переведен успешно');
+    },
+
+    error: function() {
+      alert('Возникла ошибка');
+    }
+  });
+})
