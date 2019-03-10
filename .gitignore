@@ -1,4 +1,7 @@
-# Windows thumbnail cache files
+###################################################
+# Windows 
+###################################################
+#thumbnail cache files
 Thumbs.db
 ehthumbs.db
 ehthumbs_vista.db
@@ -21,7 +24,32 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+###################################################
+# Microsoft Office
+###################################################
+*.tmp
 
+# Word temporary
+~$*.doc*
+
+# Word Auto Backup File
+Backup of *.doc*
+
+# Excel temporary
+~$*.xls*
+
+# Excel Backup File
+*.xlk
+
+# PowerPoint temporary
+~$*.ppt*
+
+# Visio autosave temporary files
+*.~vsd*
+
+###################################################
+# Microsoft Office
+###################################################
 
 *.dat
 *.tmp
