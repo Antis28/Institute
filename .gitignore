@@ -56,8 +56,9 @@ diff-word.cmd
 Diff-Word.ps1
 diff-word-wrapper.cmd
 .editorconfig
-
 pandoc.exe
+
+/!_Образцы/
 *.dat
 *.tmp
 /!_Здал !/!!!-Экономика-!!!
