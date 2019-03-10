@@ -1,4 +1,4 @@
-###################################################
+﻿###################################################
 # Windows 
 ###################################################
 #thumbnail cache files
@@ -51,6 +51,13 @@ Backup of *.doc*
 # Microsoft Office
 ###################################################
 
+.gitattributes
+diff-word.cmd
+Diff-Word.ps1
+diff-word-wrapper.cmd
+.editorconfig
+
+pandoc.exe
 *.dat
 *.tmp
 /!_Здал !/!!!-Экономика-!!!
