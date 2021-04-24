@@ -1,0 +1,105 @@
+// возвращает cookie с именем name, если есть, если нет, то undefined
+'use strict';
+function getCookie(name) {
+  var matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+// устанавливает cookie с именем name и значением value
+// options - объект с свойствами cookie (expires, path, domain, secure)
+function setCookie(name, value, options) {
+  options = options || {};
+
+  var expires = options.expires;
+
+  if (typeof expires == "number" && expires) {
+    var d = new Date();
+    d.setTime(d.getTime() + expires * 1000);
+    expires = options.expires = d;
+  }
+  if (expires && expires.toUTCString) {
+    options.expires = expires.toUTCString();
+  }
+
+  value = encodeURIComponent(value);
+
+  var updatedCookie = name + "=" + value;
+
+  for (var propName in options) {
+    updatedCookie += "; " + propName;
+    var propValue = options[propName];
+    if (propValue !== true) {
+      updatedCookie += "=" + propValue;
+    }
+  }
+
+  document.cookie = updatedCookie;
+}
+
+// удаляет cookie с именем name
+function deleteCookie(name) {
+  setCookie(name, "", {
+    expires: -1
+  })
+}
+
+class Options {
+  constructor(expires, path){
+    this.expires = expires;
+    this.path = path;
+  }
+}
+
+
+function submitForm(form) {
+
+  // alert('value = '+form.answer.value);
+  // alert('ID = '+form.id);
+
+  var pollValue = form.answer.value;
+  var pollID = form.id;
+  var formParent = document.querySelector('.formPanel');
+
+  if (pollValue === '') {
+    alert('Выберите ответ!');
+    return;
+  }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/wp-content/themes/okwell/assets/js/poll.php?id='+pollID+'&value='+pollValue);
+  xhr.send();
+
+  xhr.onreadystatechange = function() {
+    if (this.readyState != 4)
+      return;
+
+    if (this.status != 200) {
+      alert('Error: ' + this.status ? this.statusText : 'Request failed');
+      return;
+    }
+    var response = JSON.parse(this.responseText);
+    var total = 0;
+    var maxValue = 0;
+    // var head = xhr.getAllResponseHeaders()
+    // alert(this.responseText);
+    // alert(head);
+    for (var i = 0; i < response.choices.length; i++) {
+      total = total + response.choices[i].value;
+      if (response.choices[i].value > maxValue)
+        maxValue = response.choices[i].value;
+    }
+    // alert(total);
+    formParent.removeChild(form);
+
+    for (var i = 0; i < response.choices.length; i++) {
+      formParent.insertAdjacentHTML('beforeEnd', '<p>'+response.choices[i].text+'<span class="percentage">'+Math.round(response.choices[i].value*100/total)+'%</span></p><div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="'+Math.round(response.choices[i].value*100/maxValue)+'" aria-valuemin="0" aria-valuemax="100" style="width: '+Math.round(response.choices[i].value*100/maxValue)+'%;"><span class="sr-only">'+Math.round(response.choices[i].value*100/maxValue)+'%</span></div></div>');
+    }
+    formParent.insertAdjacentHTML('beforeEnd', '<p>Всего голосов: '+total+'</p>');
+
+    var opt = new Options(432000, '/');
+    setCookie('done'+response.id, 'yes', opt);
+
+  }
+}
