@@ -1,0 +1,7 @@
+var items1 = {"http://njnj.ru/index.htm" : " &bull; Главная ", "http://njnj.ru/golits/" : " &bull; Страницы ", 
+"http://njnj.ru/talk/talklist.htm" : " &bull; Разговорник ", 
+"http://njnj.ru/gram/gramlist.htm" : " &bull; Грамматика ", "http://njnj.ru/exer/exerlist.htm" : "&bull; Упражнения ","http://njnj.ru//test/testlist.htm" : "&bull; Тесты ","http://njnj.ru/partrans/partranslist.htm" : "&bull; Темы ",
+"http://njnj.ru/toefl/toefllist.htm" :  "&bull; TOEFL",  
+"http://njnj.ru/smap1.htm" :  "&bull; Карта сайта "}; 
+for (var key in items1) 
+document.write("<A href="+key+">"+items1[key]+"</A>");
